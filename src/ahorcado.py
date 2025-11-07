@@ -51,9 +51,10 @@ def obtener_palabra_aleatoria(min_length = 5)->str:
         print("Error al obtener palabra de la API:", e)
     print("Se procederá a obtener la palabra de una lista local.")
     palabras_ahorcado = [
-        "montaña", "pelota", "elefante", "naranja", "carpeta", "tren",
-        "jardin", "zapato", "camiseta", "limon", "escuela", "parque",
-        "ventana", "mariposa", "coche"
+        "montaña", "pelota", "elefante", "naranja", "carpeta",
+        "jardin", "zapato", "camiseta", "limon", "escuela",
+        "parque", "ventana", "mariposa", "coche", "bandera",
+        "bicicleta", "tomate", "animal", "planeta", "magia"
     ]
     return random.choice(palabras_ahorcado)
 
@@ -76,7 +77,7 @@ def dificultad()->int:
     elegida_dificultad = False
     while not elegida_dificultad:
         try:
-            dificultad = int(input("(1) Hardcore (1 intento)\t (2) Dificil (3 intentos)\t(3) Normal(5 intentos)\t(4) Facil (7 intentos)\n"))
+            dificultad = int(input("(1) Hardcore (1 intento)\t (2) Dificil (3 intentos)\t(3) Normal (5 intentos)\t(4) Facil (7 intentos)\n"))
             if dificultad == 1:
                 intentos = 1
                 elegida_dificultad = True
@@ -98,7 +99,7 @@ def solicitar_letra(letras_usadas:list[str])->str:
     '''
     Solicita una letra al jugador.
     
-    La letra tiene que ser válida (solo una letra) y no puede contener carácteres especiales ni números ni estar ya usada.
+    La letra tiene que ser válida (solo una letra) y no puede contener caracteres especiales ni números ni estar ya usada.
     
     Parameters
     ----------
@@ -272,7 +273,7 @@ def jugar():
         if "_" not in guiones:
             adivinado = True
         elif intentos > 0:
-            adivinado, intentos = comprobar_palabra(palabra_a_adivinar, intentos)
+            adivinado, intentos = comprobar_palabra(palabra_a_adivinar,intentos)
         if adivinado and not mensaje_victoria:
             if intentos == 5:
                 print("¡Felicidades! Has adivinado la palabra con tan solo un fallo.")
