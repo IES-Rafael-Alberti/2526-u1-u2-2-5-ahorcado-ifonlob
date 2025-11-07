@@ -18,7 +18,7 @@ Este proyecto implementa el clásico **Juego del Ahorcado** en consola, donde:
 
 - El programa selecciona automáticamente una palabra secreta (mínimo 5 letras) desde una API (o una lista si no hay conexión).
 - El usuario debe adivinar dicha palabra **letra a letra**.
-- El número de intentos permitidos es limitado (por defecto, 6).
+- El número de intentos permitidos depende de la dificultad escogida (Existen 4 tipos de dificultad).
 - Permite adivinar la palabra entera en cualquier momento.
 - El juego controla letras ya usadas, rechaza entradas no válidas y muestra el estado tras cada jugada.
 
@@ -31,15 +31,20 @@ Este proyecto implementa el clásico **Juego del Ahorcado** en consola, donde:
 ======================
   JUEGO DEL AHORCADO
 ======================
+
+Elija modo de dificultad:
+
+(1) Hardcore (1 intento)         (2) Dificil (3 intentos)       (3) Normal (5 intentos)  (4) Facil (7 intentos)
+
 Bienvenido al juego del ahorcado. La palabra a adivinar posee 7 letras distribuidas de la siguiente forma:
-Tienes 6 intentos.
+Tienes x intentos (Depende de la dificutad escogida)
 _ _ _ _ _ _ _
 Ahora indique una letra:
 > E
 La letra introducida no se encuentra en la palabra.
 Tu palabra se queda de la siguiente forma:
 _ _ _ _ _ _ _
-Te quedan 5 intentos.
+Te quedan x intentos.
 Recuerde que ya ha usado las siguientes letras: E
 ...
 ¡Felicidades! Has adivinado la palabra con tan solo 2 fallos.
@@ -49,7 +54,7 @@ Recuerde que ya ha usado las siguientes letras: E
 ## Requisitos del sistema
 
 - **Python 3.10 o superior**.
-- **Requisitos para palabras por API:** `requests` (añádelo a dependencias).
+- **Requisitos para palabras por API:** `requests` [(véase apartado 5)](#uso-del-archivo-dependenciastxt-opcional).
 - Si usas más librerías, anótalas en el archivo `dependencias.txt`.
 
 ## Instalación de Python en los diferentes sistemas operativos
@@ -119,7 +124,8 @@ py -m venv .venv
 python ahorcado.py
 ```
 
-El juego selecciona automáticamente una palabra desde una API.
+El juego selecciona automáticamente una palabra desde una API siempre que sea posible.
+En este caso, se selecciona una palabra aleatoria de una lista local.
 
 ## Uso del archivo dependencias.txt (opcional)
 
@@ -138,7 +144,7 @@ Si el archivo no existe o está vacío, no se necesitan dependencias adicionales
 
 # Evidencia depuración
 
-A lo largo del desarrollo del progama he utilizado en numerosas ocasiones el depurador o Python debugger integrado en VSC gracias a la extnsión "Python".
+A lo largo del desarrollo del programa se ha utilizado en numerosas ocasiones el depurador o Python Debugger integrado en VSC gracias a la extensión "Python".
 
 Cabe destacar que me ha ayudado en situaciones desafiantes en las cuales necesitaba saber el valor exacto que tomaban las variables a lo largo del transcurso del programa.
 
@@ -180,8 +186,6 @@ Como se puede observar, gracias al depurador se puede descubrir en tiempo real c
   Instala manualmente o revisa dependencias.
 - **No reconoce 'requests':**
   Instala con: `python -m pip install requests`
-- **Pantalla no se limpia correctamente:**
-  Prueba `os.system('clear')` (Linux/Mac) o `os.system('cls')` (Windows).
 - **Teclas especiales (tildes, ñ):**
   El juego solo acepta letras del alfabeto estándar, sin carácteres especiales ni tildes.
 
