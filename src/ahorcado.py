@@ -1,5 +1,6 @@
 import random
 import os
+import requests
 
 """
 ==================
@@ -15,7 +16,84 @@ Práctica de programación que evalúa:
 Autor: Irene Foncubierta Lobatón    
 Fecha: 6/11/2025
 """
+def obtener_palabra_aleatoria(min_length = 5)->str:
+    '''
+    Obtiene una palabra aleatoria en español de la API de RAE, y usa una lista local como respaldo si hay error.
 
+    La función realiza una consulta a la url 'https://rae-api.com/api/random', y si la petición es exitosa utiliza la palabra de la API. En caso contrario, selecciona una palabra de una lista local predeterminada. Esto garantiza que siempre se obtiene una palabra válida para el juego o aplicación aunque falle la conexión.
+
+    Parameters
+    ----------
+    min_length : int
+        Longitud mínima de la palabra (En este caso 5 carácteres.)
+
+    Returns
+    -------
+    str
+        Una palabra aleatoria en español, obtenida de la API de RAE o de la lista local, según disponibilidad.
+    '''
+    url = "https://rae-api.com/api/random"
+    params = {}
+    if min_length is not None:
+        params["min_length"] = min_length
+    try:
+        respuesta = requests.get(url, params=params, timeout=5)
+        if respuesta.status_code == 200:
+            datos = respuesta.json()
+            palabra = datos.get("data", {}).get("word", None)
+            if isinstance(palabra, str) and palabra.isalpha():
+                return palabra
+            else:
+                print("Advertencia: la API respondió pero sin palabra válida.")
+        else:
+            print("Error al obtener palabra:", respuesta.status_code)
+    except Exception as e:
+        print("Error al obtener palabra de la API:", e)
+    print("Se procederá a obtener la palabra de una lista local.")
+    palabras_ahorcado = [
+        "montaña", "pelota", "elefante", "naranja", "carpeta", "tren",
+        "jardin", "zapato", "camiseta", "limon", "escuela", "parque",
+        "ventana", "mariposa", "coche"
+    ]
+    return random.choice(palabras_ahorcado)
+
+def dificultad()->int:
+    '''
+    Solicita la dificultad deseada al jugador.
+
+    El usuario tiene que elegir entre 4 niveles de dificultad diferentes predefinidos según se desee.
+    
+    Parameters
+    ----------
+    None
+    
+    Returns
+    -------
+    int
+        El número de intentos según la dificultad escogida.
+    '''
+    print("Elija modo de dificultad:\n")
+    elegida_dificultad = False
+    while not elegida_dificultad:
+        try:
+            dificultad = int(input("(1) Hardcore (1 intento)\t (2) Dificil (3 intentos)\t(3) Normal(5 intentos)\t(4) Facil (7 intentos)\n"))
+            if dificultad == 1:
+                intentos = 1
+                elegida_dificultad = True
+            elif dificultad == 2:
+                intentos = 3
+                elegida_dificultad = True
+            elif dificultad == 3:
+                intentos = 5
+                elegida_dificultad = True
+            elif dificultad == 4:
+                intentos = 7
+                elegida_dificultad = True
+            else:
+                print("No has introducido un valor válido, intente de nuevo. (Solo se permiten 1,2,3 y 4)")
+        except ValueError:
+            print("Introduzca un valor válido, por favor. (Solo se permiten 1,2,3 y 4)")
+    return intentos
 def solicitar_letra(letras_usadas:list[str])->str:
     '''
     Solicita una letra al jugador.
@@ -29,11 +107,10 @@ def solicitar_letra(letras_usadas:list[str])->str:
     
     Returns
     -------
-    letra:
+    str
         La letra introducida por consola por el jugador.
-    
     '''
-    letra = input("Ahora indique una letra:\n").upper()
+    letra = input("Ahora indique una letra:\n").upper().strip()
     while not letra.isalpha() or len(letra) != 1 or letra in letras_usadas:
         if letra in letras_usadas:
             print("Ya has introducido esa letra, introduzca una diferente.")
@@ -147,13 +224,13 @@ def comprobar_palabra(palabra_a_adivinar, intentos):
         Número actualizado de intentos restantes.
     """
 
-    palabra = input("Introduzca la palabra o introduzca 'Skip' para saltar turno si no desea introducir una palabra:\n")
+    palabra = input("Introduzca la palabra o introduzca 'Skip' para saltar turno si no desea introducir una palabra:\n").strip()
     while not palabra.isalpha() and palabra != "Skip":
         print("Introduzca una palabra válida, por favor. (Revise si ha introducido carácteres especiales.)")
-        palabra = input("Introduzca la palabra o introduzca 'Skip' para saltar turno si no desea introducir una palabra:\n").upper()
+        palabra = input("Introduzca la palabra o introduzca 'Skip' para saltar turno si no desea introducir una palabra:\n").strip()
     while len(palabra) != len(palabra_a_adivinar) and palabra != "Skip":
         print("Introduzca una palabra válida, por favor. (Revise si la longitud de la palabra corresponde con la de la palabra a adivinar.)")
-        palabra = input("Introduzca la palabra o introduzca 'Skip' para saltar turno si no desea introducir una palabra:\n")
+        palabra = input("Introduzca la palabra o introduzca 'Skip' para saltar turno si no desea introducir una palabra:\n").strip()
     adivinado = False
     if palabra.lower() == palabra_a_adivinar:
         adivinado = True
@@ -163,31 +240,27 @@ def comprobar_palabra(palabra_a_adivinar, intentos):
         print("No has acertado la palabra, siga intentándolo.")
         intentos -= 1
         print("Te quedan", intentos, "intentos.\n")
-    if not adivinado and palabra != "Skip" and intentos == 0:
-        print("Has perdido. La palabra era:", palabra_a_adivinar)
     return adivinado, intentos
 
 def jugar():
     try:
         ancho = os.get_terminal_size().columns
     except OSError:
-        ancho = 50  
-    palabras_ahorcado = [
-        "montaña", "pelota", "elefante", "naranja", "carpeta", "tren",
-        "jardín", "zapato", "camiseta", "limón", "escuela", "parque",
-        "ventana", "mariposa", "coche"
-    ]
-    palabra_a_adivinar = random.choice(palabras_ahorcado)
+        ancho = 50
+    palabra_a_adivinar = obtener_palabra_aleatoria(min_length = 5)
     lista_palabra_a_adivinar = list(palabra_a_adivinar)
     letras_usadas = []
-    intentos = 6
+    intentos = dificultad()
     guiones = ["_"] * len(palabra_a_adivinar)
     adivinado = False
     print("==================".center(ancho))
     print("JUEGO DEL AHORCADO".center(ancho))
     print("==================".center(ancho))
     print(f"Bienvenido al juego del ahorcado. La palabra a adivinar posee", len(palabra_a_adivinar), "letras distribuidas de la siguiente forma:\n")
-    print("Tienes 6 intentos.")
+    if intentos == 1:
+        print("Tienes un intento solamente.")
+    else:
+        print("Tienes",intentos,"intentos.")
     print(" ".join(guiones))
     print(" ")
     mensaje_victoria = False
@@ -198,7 +271,7 @@ def jugar():
         actualizar_palabra(intentos, letras_usadas, guiones)
         if "_" not in guiones:
             adivinado = True
-        else:
+        elif intentos > 0:
             adivinado, intentos = comprobar_palabra(palabra_a_adivinar, intentos)
         if adivinado and not mensaje_victoria:
             if intentos == 5:
@@ -208,8 +281,8 @@ def jugar():
             else: 
                 print("¡Felicidades! Has adivinado la palabra con tan solo",(6 - intentos),"fallos.")
             mensaje_victoria = True
-        if intentos == 0 and not adivinado:
-            print("Has perdido. La palabra era:", palabra_a_adivinar)
+    if intentos == 0 and not adivinado:
+        print("Has perdido. La palabra era:", palabra_a_adivinar)
     """
     Ejecuta una partida completa del juego del ahorcado.
 
