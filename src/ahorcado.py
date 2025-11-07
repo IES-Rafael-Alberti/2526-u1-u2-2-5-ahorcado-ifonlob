@@ -2,6 +2,7 @@ import random
 import os
 
 """
+==================
 Juego del Ahorcado
 ==================
 
@@ -227,6 +228,11 @@ def jugar():
 
 def main():
     jugar()
-
+    eleccion = input("¿Deseas volver a jugar?\nIntroduzca 'Si' o 'No'\n")
+    if eleccion == "Si":
+        main()
+    else:
+        print("Gracias por jugar :). ¡Esperamos verte pronto!")
+    
 if __name__ == "__main__":
     main()
