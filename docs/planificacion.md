@@ -3,157 +3,116 @@
 ## Análisis del Problema
 
 ### Entrada
-- Palabra a adivinar (jugador 1)
-- Letras para adivinar (jugador 2)
+
+- Palabra a adivinar (generada automáticamente, min. 5 letras, desde API o lista local)
+- Letras propuestas por el jugador (vía input)
+- Dificultad seleccionada (elige número de intentos)
+
 
 ### Salida
-- Estado actual de la palabra (con _ y letras adivinadas)
+
+- Estado parcial de la palabra (_ y letras acertadas)
 - Intentos restantes
 - Letras ya usadas
-- Mensajes de retroalimentación
+- Mensajes informativos y de error
 - Mensaje de victoria o derrota
 
+
 ### Proceso
-1. Solicitar y validar palabra
-2. Inicializar el estado del juego
-3. Mientras haya intentos y no se haya ganado:
-   - Mostrar estado
-   - Solicitar letra
-   - Verificar letra
-   - Actualizar estado
-4. Mostrar resultado final
+
+1. Obtener/la palabra secreta (API o lista local, mín. 5 letras)
+2. Solicitar nivel de dificultad (asigna intentos según opción)
+3. Inicializar estado del juego (guiones, letras usadas, variables)
+4. Mientras queden intentos y la palabra no esté adivinada:
+    - Mostrar estado actual del juego
+    - Solicitar nueva letra (y validar)
+    - Actualizar letras usadas e intentos según acierto o error
+    - Permitir intento de adivinanza completa de palabra (o saltar turno)
+    - Comprobar si se ha completado la palabra
+5. Mostrar mensaje final (victoria o derrota)
 
 ## Pseudocódigo
 
 ```
 INICIO
-    ESCRIBIR "=== JUEGO DEL AHORCADO ==="
-    
-    // Solicitar palabra
-    REPETIR
-        LEER palabra
-        SI longitud(palabra) < 5 ENTONCES
-            ESCRIBIR "Error: mínimo 5 caracteres"
-        FIN SI
-        SI NO es_solo_letras(palabra) ENTONCES
-            ESCRIBIR "Error: solo letras"
-        FIN SI
-    HASTA QUE longitud(palabra) >= 5 Y es_solo_letras(palabra)
-    
-    palabra = a_mayusculas(palabra)
-    limpiar_pantalla()
-    
-    // Inicializar juego
-    intentos = 5
-    letras_usadas = []
-    palabra_oculta = crear_palabra_oculta(palabra)  // "_ _ _ _ _"
-    ganado = FALSO
-    
-    // Bucle principal
-    MIENTRAS intentos > 0 Y NO ganado HACER
-        mostrar_estado(palabra_oculta, intentos, letras_usadas)
-        
-        // Solicitar letra
-        REPETIR
-            LEER letra
-            SI longitud(letra) != 1 O NO es_letra(letra) ENTONCES
-                ESCRIBIR "Error: introduce una sola letra"
-            FIN SI
-            SI letra ESTÁ_EN letras_usadas ENTONCES
-                ESCRIBIR "Error: letra ya usada"
-            FIN SI
-        HASTA QUE longitud(letra) == 1 Y es_letra(letra) Y letra NO_ESTÁ_EN letras_usadas
-        
-        letra = a_mayusculas(letra)
-        AÑADIR letra A letras_usadas
-        
-        // Verificar letra
-        SI letra ESTÁ_EN palabra ENTONCES
-            ESCRIBIR "¡Bien! La letra está en la palabra"
-            actualizar_palabra_oculta(palabra, palabra_oculta, letra)
-            
-            SI "_" NO_ESTÁ_EN palabra_oculta ENTONCES
-                ganado = VERDADERO
-            FIN SI
+    OBTENER palabra_aleatoria (API o lista local, min. 5 letras)
+    ELECCIÓN de dificultad → intentos
+    INICIALIZAR: letras_usadas = [], guiones = "_" * longitud, adivinado = FALSO
+
+    MIENTRAS intentos > 0 Y NO adivinado HACER
+        MOSTRAR estado (guiones, intentos, letras_usadas)
+        SOLICITAR letra válida y no repetida
+        ACTUALIZAR estado de palabra y letras_usadas
+        SI letra NO está en palabra ENTONCES
+            RESTAR un intento
+        SI "_" NO_ESTÁ_EN guiones ENTONCES
+            adivinado = VERDADERO
         SINO
-            ESCRIBIR "¡Letra incorrecta!"
-            intentos = intentos - 1
-        FIN SI
-    FIN MIENTRAS
-    
-    // Mensaje final
-    SI ganado ENTONCES
-        ESCRIBIR "¡FELICIDADES! Has adivinado la palabra:", palabra
+            PERMITIR intentar adivinar la palabra (o saltar turno)
+            SI palabra completa acertada ENTONCES
+                adivinado = VERDADERO
+
+    SI adivinado ENTONCES
+        ESCRIBIR "¡Felicidades! ..."
     SINO
-        ESCRIBIR "¡GAME OVER! La palabra era:", palabra
-    FIN SI
+        ESCRIBIR "Has perdido. La palabra era:", palabra
 FIN
 ```
+
 
 ## Variables Necesarias
 
 | Variable | Tipo | Propósito |
-|----------|------|-----------|
-| palabra | str | Palabra a adivinar (mayúsculas) |
-| palabra_oculta | str | Estado actual con _ y letras adivinadas |
-| letra | str | Letra introducida por el jugador |
-| letras_usadas | list | Lista de letras ya usadas |
-| intentos | int | Número de intentos restantes |
-| ganado | bool | Indica si se ha ganado el juego |
-| INTENTOS_MAXIMOS | int | Constante con el número inicial de intentos |
+| :-- | :-- | :-- |
+| palabra | str | Palabra a adivinar en mayúsculas |
+| guiones | list | Estado parcial de la palabra (_ o letra acertada) |
+| letra | str | Letra introducida por jugador |
+| letras_usadas | list | Lista de letras usadas |
+| intentos | int | Intentos restantes |
+| adivinado | bool | Indica si la palabra ha sido completada |
+| dificultad | int | Nivel de dificultad elegido (define intentos) |
 
 ## Estructuras de Control Necesarias
 
 ### Bucles While
-1. **Validación de palabra**: Repetir hasta que sea válida
-2. **Validación de letra**: Repetir hasta que sea válida
-3. **Bucle principal**: Mientras haya intentos y no se haya ganado
 
-### Bucles For
-1. **Recorrer palabra**: Para actualizar palabra_oculta con las letras adivinadas
+1. **Bucle principal**: mientras haya intentos y no se haya adivinado la palabra
+2. **Validación de letra**: repetir hasta obtener letra válida
 
 ### Condicionales If
-1. Validar longitud de palabra
-2. Validar que solo contenga letras
-3. Validar letra única
-4. Comprobar si letra está en letras_usadas
-5. Comprobar si letra está en palabra
-6. Comprobar si se ha ganado (no hay '_' en palabra_oculta)
-7. Mostrar mensaje final según resultado
+
+1. Comprobar acierto/error de letra
+2. Comprobar si hay espacios sin rellenar ("_")
+3. Validar si letra ya usada
+4. Comprobar si usuario adivina palabra completa
+5. Mostrar mensaje adecuado tras victoria o derrota
+
+### Bucles For
+
+- Para actualizar guiones al acertar letra(s) en palabra
+
 
 ## Funciones Útiles de Python
 
 ### String
-- `upper()`: Convertir a mayúsculas
-- `isalpha()`: Verificar si es letra
-- `len()`: Obtener longitud
-- `in`: Verificar si carácter está en string
-- `replace()`: Reemplazar caracteres
+
+- `upper()`, `isalpha()`, `len()`, `in`
+
 
 ### List
-- `[]`: Crear lista vacía
-- `append()`: Añadir elemento
-- `in`: Verificar si elemento está en lista
+
+- `append()`, `in`, asignación de elementos
+
 
 ### Built-in
-- `enumerate()`: Obtener índice y valor en bucle for
-- `input()`: Leer entrada del usuario
-- `print()`: Mostrar salida
+
+- `input()`, `print()`, `enumerate()`, `random.choice()`
+
 
 ## Consejos para la Implementación
 
-1. **Empezar simple**: Implementar primero la lógica básica sin validaciones
-2. **Probar frecuentemente**: Ejecutar el código después de cada función
-3. **Validar paso a paso**: Añadir validaciones una vez que la lógica básica funcione
-4. **Usar funciones**: Dividir el código en funciones pequeñas y reutilizables
-5. **Comentar el código**: Explicar qué hace cada parte
-
-## Posibles Mejoras (Opcional)
-
-- Permitir frases con espacios
-- Mantener puntuación del jugador
-- Jugar varias partidas
-- Dibujar el ahorcado con ASCII art
-- Añadir categorías de palabras
-- Mostrar pistas
-- Sistema de dificultad (más o menos intentos)
+1. Mantén funciones breves y con propósito único (obtener_palabra, comprobar_letra, etc.)
+2. Usa try/except para peticiones a API y posibles errores de entrada
+3. Proporciona mensajes de error y ayuda clara al usuario
+4. Prueba cada función por separado y después el flujo completo
+5. Documenta cada función y cada bloque principal del programa
