@@ -7,6 +7,7 @@
 - [Instalación de Python](#instalaci%C3%B3n-de-python-en-los-diferentes-sistemas-operativos)
 - [Ejecución del módulo](#ejecuci%C3%B3n-del-m%C3%B3dulo)
 - [Uso del archivo dependencias.txt](#uso-del-archivo-dependenciastxt-opcional)
+- [Evidencias depuración](#evidencia-depuración)
 - [Validaciones y mensajes de error](#validaciones-y-mensajes-de-error)
 - [Problemas frecuentes (FAQ)](#problemas-frecuentes-faq)
 
@@ -135,6 +136,23 @@ py -m pip install -r dependencias.txt
 
 Si el archivo no existe o está vacío, no se necesitan dependencias adicionales.
 
+# Evidencia depuración
+
+A lo largo del desarrollo del progama he utilizado en numerosas ocasiones el depurador o Python debugger integrado en VSC gracias a la extnsión "Python".
+
+Cabe destacar que me ha ayudado en situaciones desafiantes en las cuales necesitaba saber el valor exacto que tomaban las variables a lo largo del transcurso del programa.
+
+Un ejemplo de ello es en la función `obtener_palabra_aleatoria()` la cual recibe una palabra de una API. El depurador en este caso me ha favorecido de tal forma que me ha permitido comprobar si la API devolvía valores válidos.
+
+![Evidencia API](./assets/images/evidencia1.png)
+
+Asimismo, me ha permitido colocar diversos puntos de ruptura con el fin de observar el flujo del programa más fácilmente.
+
+![Evidencia flujo del programa](./assets/images/evidencia2.png)
+
+Como se puede observar, gracias al depurador se puede descubrir en tiempo real cada uno de los valores de las diferentes variables del programa facilitándonos el trabajo.
+
+![Evidencia variables](./assets/images/evidencia3.png)
 ## Validaciones y mensajes de error
 
 - **Palabra inválida desde API:**
@@ -165,5 +183,5 @@ Si el archivo no existe o está vacío, no se necesitan dependencias adicionales
 - **Pantalla no se limpia correctamente:**
   Prueba `os.system('clear')` (Linux/Mac) o `os.system('cls')` (Windows).
 - **Teclas especiales (tildes, ñ):**
-  El juego solo acepta letras del alfabeto estándar, sin carácteres especiales.
+  El juego solo acepta letras del alfabeto estándar, sin carácteres especiales ni tildes.
 
